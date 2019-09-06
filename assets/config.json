@@ -1,0 +1,11 @@
+{
+  "rootAPI": "/api/v1/",
+  "port": 8080,
+  "db": {
+    "host": "localhost",
+    "database": "smart_grocery",
+    "user": "root",
+	"password": "",
+	"port": 3306
+  }
+}
