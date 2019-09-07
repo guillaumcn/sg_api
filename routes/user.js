@@ -95,6 +95,41 @@ module.exports = (app, db) =>
 			app.handlers.authenticate(),
 			async (req, res) =>
 			{
+				try
+				{
+					if (req.user.type != 'admin' && (req.params.id != req.user.id))
+					{
+						res.status(403);
+						res.json(app.createError('Not allowed'));
+						return;
+					}
+
+					let user = await db.users.findOne({
+						where: { id: req.params.id }
+					});
+
+					if (!user)
+					{
+						res.status(404);
+						res.json(app.createError('Object not found'));
+						return;
+					}
+
+					user.pass = undefined;
+					res.json(app.createResponse(user));
+				}
+				catch (err)
+				{
+					res.status(500);
+					res.json(app.createError('Internal error'));
+				}
+			})
+
+		// Modifie un membre avec ID
+		.put(async (req, res) =>
+		{
+			try 
+			{
 				if (req.user.type != 'admin' && (req.params.id != req.user.id))
 				{
 					res.status(403);
@@ -102,38 +137,58 @@ module.exports = (app, db) =>
 					return;
 				}
 
-				let user = await db.users.findOne({
+				let user = await db.user.findOne({
 					where: { id: req.params.id }
 				});
 
-				user.pass = undefined;
-				res.json(app.createResponse(user));
-			})
+				if (!user)
+				{
+					res.status(404);
+					res.json(app.createError('Object not found'));
+					return;
+				}
 
-		// Modifie un membre avec ID
-		.put(async (req, res) =>
-		{
-			let member = await db.members.findOne({
-				where: { id: req.params.id }
-			});
-			await member.update({ name: req.body.name });
-			if (req.body.projects !== undefined)
-				member.setProjects(await db.projects.findAll({ where: { id: { [db.Sequelize.Op.or]: req.body.projects.split(',') } } }));
-			res.json(checkAndChange("OK" || new Error(config.errors.wrongID)));
+				await user.update({ name: req.body.name });
+				res.json(app.createResponse("OK"));
+			}
+			catch (err)
+			{
+				res.status(500);
+				res.json(app.createError('Internal error'));
+			}
 		})
 
 		// remove a user with its id
 		.delete(async (req, res) =>
 		{
-			if (req.user.type != 'admin' && (req.params.id != req.user.id))
+			try
 			{
-				res.status(403);
-				res.json(app.createError('Not allowed'));
-				return;
+				if (req.user.type != 'admin' && (req.params.id != req.user.id))
+				{
+					res.status(403);
+					res.json(app.createError('Not allowed'));
+					return;
+				}
+
+				let user = await db.user.findOne({
+					where: { id: req.params.id }
+				});
+
+				if (!user)
+				{
+					res.status(404);
+					res.json(app.createError('Object not found'));
+					return;
+				}
+
+				await user.destroy({ name: req.body.name });
+				res.json(app.createResponse("OK"));
 			}
-			
-			let deletedNumber = await db.members.destroy({ where: { id: req.params.id } });
-			res.json(checkAndChange(deletedNumber == 1 ? 'OK' : new Error(config.errors.wrongID)));
+			catch (err)
+			{
+				res.status(500);
+				res.json(app.createError('Internal error'));
+			}
 		});
 
 	return UserRouter;

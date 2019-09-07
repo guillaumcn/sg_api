@@ -13,6 +13,9 @@ module.exports = (app, db) =>
 			app.handlers.check_params({
 				user: {
 					match: /^[0-9]+$/,
+				},
+				type: {
+					match: /^(?:public)$/
 				}
 			}),
 			async (req, res) =>
@@ -23,7 +26,9 @@ module.exports = (app, db) =>
 
 					if (req.user.type != 'admin') where.user_id = req.user.id;
 					// admin can select every client or only for one user
-					if (req.body.user && req.user.type == 'admin') where.user_id = parseInt(req.body.user);
+					if (req.body.user && req.user.type == 'admin') where.user_id = req.body.user;
+
+					if (req.body.type) where.type = req.body.type;
 
 					let all_clients = await db.client.findAll({
 						where: where
@@ -173,7 +178,6 @@ module.exports = (app, db) =>
 					}
 
 					await client.destroy();
-
 					res.json(app.createResponse("OK"));
 				}
 				catch (err)
