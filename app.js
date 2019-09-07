@@ -22,7 +22,7 @@ db.sequelize.authenticate()
 
 		app.oauth = new oauthServer({
 			model: require('./assets/oauth2')(db),
-			accessTokenLifetime: 3155760000,
+			accessTokenLifetime: 3600,
 			refreshTokenLifetime: 3155760000
 		});
 

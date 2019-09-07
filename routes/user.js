@@ -126,70 +126,74 @@ module.exports = (app, db) =>
 			})
 
 		// Modifie un membre avec ID
-		.put(async (req, res) =>
-		{
-			try 
+		.put(
+			app.handlers.authenticate(),
+			async (req, res) =>
 			{
-				if (req.user.type != 'admin' && (req.params.id != req.user.id))
+				try 
 				{
-					res.status(403);
-					res.json(app.createError('Not allowed'));
-					return;
+					if (req.user.type != 'admin' && (req.params.id != req.user.id))
+					{
+						res.status(403);
+						res.json(app.createError('Not allowed'));
+						return;
+					}
+
+					let user = await db.user.findOne({
+						where: { id: req.params.id }
+					});
+
+					if (!user)
+					{
+						res.status(404);
+						res.json(app.createError('Object not found'));
+						return;
+					}
+
+					await user.update({ name: req.body.name });
+					res.json(app.createResponse("OK"));
 				}
-
-				let user = await db.user.findOne({
-					where: { id: req.params.id }
-				});
-
-				if (!user)
+				catch (err)
 				{
-					res.status(404);
-					res.json(app.createError('Object not found'));
-					return;
+					res.status(500);
+					res.json(app.createError('Internal error'));
 				}
-
-				await user.update({ name: req.body.name });
-				res.json(app.createResponse("OK"));
-			}
-			catch (err)
-			{
-				res.status(500);
-				res.json(app.createError('Internal error'));
-			}
-		})
+			})
 
 		// remove a user with its id
-		.delete(async (req, res) =>
-		{
-			try
+		.delete(
+			app.handlers.authenticate(),
+			async (req, res) =>
 			{
-				if (req.user.type != 'admin' && (req.params.id != req.user.id))
+				try
 				{
-					res.status(403);
-					res.json(app.createError('Not allowed'));
-					return;
+					if (req.user.type != 'admin' && (req.params.id != req.user.id))
+					{
+						res.status(403);
+						res.json(app.createError('Not allowed'));
+						return;
+					}
+
+					let user = await db.user.findOne({
+						where: { id: req.params.id }
+					});
+
+					if (!user)
+					{
+						res.status(404);
+						res.json(app.createError('Object not found'));
+						return;
+					}
+
+					await user.destroy({ name: req.body.name });
+					res.json(app.createResponse("OK"));
 				}
-
-				let user = await db.user.findOne({
-					where: { id: req.params.id }
-				});
-
-				if (!user)
+				catch (err)
 				{
-					res.status(404);
-					res.json(app.createError('Object not found'));
-					return;
+					res.status(500);
+					res.json(app.createError('Internal error'));
 				}
-
-				await user.destroy({ name: req.body.name });
-				res.json(app.createResponse("OK"));
-			}
-			catch (err)
-			{
-				res.status(500);
-				res.json(app.createError('Internal error'));
-			}
-		});
+			});
 
 	return UserRouter;
 };
