@@ -1,88 +1,84 @@
 const md5 = require('md5');
 const express = require('express');
 
-module.exports = function (app, db)
+module.exports = (app, db) =>
 {
 	let UserRouter = express.Router();
 
 	UserRouter.route('/')
 
-		// Récupère tous les membres
-		/*.get(async (req, res) =>
-		{
-			if (req.query.max !== undefined && (isNaN(req.query.max) || parseInt(req.query.max) < 1))
+		// Get all existing user (only for admin)
+		.get(
+			app.handlers.authenticate(),
+			async (req, res) =>
 			{
-				res.json(checkAndChange(new Error(config.errors.wrongMaxValue)));
-				return;
-			}
-
-			var options = {
-				include: [
-					{
-						model: db.projects,
-						attributes: ['id']
-					},
-					{
-						model: db.comments,
-						attributes: ['id']
-					}
-				]
-			};
-			if (req.query.max) options.limit = parseInt(req.query.max);
-			let allMembers = await db.members.findAll(options);
-			res.json(checkAndChange(allMembers))
-		})*/
-
-		// Add user with password and mail
-		.post(app.oauth.authenticateHandler(true), async (req, res) =>
-		{
-			try 
-			{
-				let user_count = await db.user.count({
-					distinct: true,
-					col: 'id'
-				});
-
-				let new_user = null;
-				if (user_count === 0) // if no existing user, create admin
-					new_user = await db.user.create({ mail: 'admin', type: 'admin', pass: md5(req.body.pass) });
-				else
+				try 
 				{
-					// Parameters check
-					if (!req.body.mail || !req.body.pass || !req.body.type)
+					if (req.user.type != 'admin')
 					{
-						res.status(400);
-						res.json(app.createError('Missing parameter'));
+						res.status(403);
+						res.json(app.createError('Not allowed'));
 						return;
 					}
 
+					let all_users = await db.user.findAll();
+					res.json(app.createResponse(all_users));
+				}
+				catch (err)
+				{
+					res.status(500);
+					res.json(app.createError('Internal error'));
+				}
+			})
+
+		// Add user with password and mail
+		.post(
+			app.handlers.authenticate(true),
+			app.handlers.check_params({
+				mail: {
+					required: true,
+					match: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+				},
+				pass: {
+					required: true,
+					min_length: 6,
+					max_length: 30
+				},
+				type: {
+					required: true,
+					match: /^(?:admin|user|designer)$/
+				}
+			}),
+			async (req, res) =>
+			{
+				try 
+				{
 					// if not admin try to create admin
 					if (req.body.type == 'admin' && (!req.user || req.user.type != 'admin'))
 					{
 						res.status(403);
-						res.json(app.createError('Cannot create admin user'));
+						res.json(app.createError('Not allowed'));
 						return;
 					}
 
-					new_user = await db.user.create({ mail: req.body.mail, type: req.body.type, pass: md5(req.body.pass) });
-				}
+					let new_user = await db.user.create({ mail: req.body.mail, type: req.body.type, pass: md5(req.body.pass) });
 
-				new_user.pass = undefined;
-				res.json(app.createResponse(new_user));
-			}
-			catch (err)
-			{
-				if (err.parent.code == 'ER_DUP_ENTRY')
+					new_user.pass = undefined;
+					res.json(app.createResponse(new_user));
+				}
+				catch (err)
 				{
-					res.status(409);
-					res.json(app.createError('Mail already registered'));
-					return;
-				}
+					if (err.parent.code == 'ER_DUP_ENTRY')
+					{
+						res.status(409);
+						res.json(app.createError('Mail already registered'));
+						return;
+					}
 
-				res.status(500);
-				res.json(app.createError('Internal error'));
-			}
-		});
+					res.status(500);
+					res.json(app.createError('Internal error'));
+				}
+			});
 
 	/*MembersRouter.route('/:id')
 

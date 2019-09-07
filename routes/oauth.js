@@ -1,7 +1,7 @@
 const express = require('express');
 const oauthServer = require('oauth2-server');
 
-module.exports = function (app, db)
+module.exports = (app, db) =>
 {
 	let OauthRouter = express.Router();
 
