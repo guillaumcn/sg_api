@@ -10,6 +10,11 @@ module.exports = (app, db) =>
 		// Get all existing user (only for admin)
 		.get(
 			app.handlers.authenticate(),
+			app.handlers.check_params({
+				type: {
+					match: /^(?:admin|user|designer)$/
+				}
+			}),
 			async (req, res) =>
 			{
 				try 
@@ -21,7 +26,10 @@ module.exports = (app, db) =>
 						return;
 					}
 
-					let all_users = await db.user.findAll();
+					let where = {};
+					if (req.body.type) where.type = req.body.type;
+
+					let all_users = await db.user.findAll({where: where});
 					res.json(app.createResponse(all_users));
 				}
 				catch (err)
@@ -80,31 +88,33 @@ module.exports = (app, db) =>
 				}
 			});
 
-	/*MembersRouter.route('/:id')
+	UserRouter.route('/:id')
 
 		// Récupère un membre avec son ID
-		.get(async (req, res) =>
-		{
-			let member = await db.members.findOne({
-				where: { id: req.params.id },
-				include: [
-					{
-						model: db.projects,
-					},
-					{
-						model: db.comments,
-					}
-				]
-			});
-			member = member.get({ plain: true });
+		.get(
+			app.handlers.authenticate(),
+			async (req, res) =>
+			{
+				let member = await db.members.findOne({
+					where: { id: req.params.id },
+					include: [
+						{
+							model: db.projects,
+						},
+						{
+							model: db.comments,
+						}
+					]
+				});
+				member = member.get({ plain: true });
 
-			if (req.body.projects_details != 1)
-				member.projects = member.projects.map(function (project) { return project.id });
-			if (req.body.comments_details != 1)
-				member.comments = member.comments.map(function (comment) { return comment.id });
-				
-			res.json(checkAndChange(member || new Error(config.errors.wrongID)));
-		})
+				if (req.body.projects_details != 1)
+					member.projects = member.projects.map(function (project) { return project.id });
+				if (req.body.comments_details != 1)
+					member.comments = member.comments.map(function (comment) { return comment.id });
+
+				res.json(checkAndChange(member || new Error(config.errors.wrongID)));
+			})
 
 		// Modifie un membre avec ID
 		.put(async (req, res) =>
@@ -123,7 +133,7 @@ module.exports = (app, db) =>
 		{
 			let deletedNumber = await db.members.destroy({ where: { id: req.params.id } });
 			res.json(checkAndChange(deletedNumber == 1 ? 'OK' : new Error(config.errors.wrongID)));
-		});*/
+		});
 
 	return UserRouter;
 };
