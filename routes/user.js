@@ -90,7 +90,7 @@ module.exports = (app, db) =>
 
 	UserRouter.route('/:id')
 
-		// Récupère un membre avec son ID
+		// get a user with its id
 		.get(
 			app.handlers.authenticate(),
 			async (req, res) =>
@@ -122,9 +122,16 @@ module.exports = (app, db) =>
 			res.json(checkAndChange("OK" || new Error(config.errors.wrongID)));
 		})
 
-		// Supprime un membre avec ID
+		// remove a user with its id
 		.delete(async (req, res) =>
 		{
+			if (req.user.type != 'admin' && (req.params.id != req.user.id))
+			{
+				res.status(403);
+				res.json(app.createError('Not allowed'));
+				return;
+			}
+			
 			let deletedNumber = await db.members.destroy({ where: { id: req.params.id } });
 			res.json(checkAndChange(deletedNumber == 1 ? 'OK' : new Error(config.errors.wrongID)));
 		});

@@ -79,17 +79,21 @@ module.exports = (app, db) =>
 			{
 				try 
 				{
-					let where = { id: req.params.id };
-					if (req.user.type != 'admin') where.user_id = req.user.id; // admin can select any client
-
 					let client = await db.client.findOne({
-						where: where
+						where: { id: req.params.id }
 					});
 
 					if (!client)
 					{
 						res.status(404);
 						res.json(app.createError('Object not found'));
+						return;
+					}
+
+					if (req.user.type != 'admin' && client.user_id != req.user.id)
+					{
+						res.status(403);
+						res.json(app.createError('Not allowed'));
 						return;
 					}
 
@@ -115,17 +119,21 @@ module.exports = (app, db) =>
 			{
 				try 
 				{
-					let where = { id: req.params.id };
-					if (req.user.type != 'admin') where.user_id = req.user.id; // admin can update any client
-
 					let client = await db.client.findOne({
-						where: where
+						where: { id: req.params.id }
 					});
 
 					if (!client)
 					{
 						res.status(404);
 						res.json(app.createError('Object not found'));
+						return;
+					}
+
+					if (req.user.type != 'admin' && client.user_id != req.user.id)
+					{
+						res.status(403);
+						res.json(app.createError('Not allowed'));
 						return;
 					}
 
@@ -146,17 +154,25 @@ module.exports = (app, db) =>
 			{
 				try 
 				{
-					let where = { id: req.params.id };
-					if (req.user.type != 'admin') where.user_id = req.user.id; // admin can destroy any client
+					let client = await db.client.findOne({
+						where: { id: req.params.id }
+					});
 
-					let deletedNumber = await db.client.destroy({ where: where });
-
-					if (deletedNumber == 0)
+					if (!client)
 					{
 						res.status(404);
 						res.json(app.createError('Object not found'));
 						return;
 					}
+
+					if (req.user.type != 'admin' && client.user_id != req.user.id)
+					{
+						res.status(403);
+						res.json(app.createError('Not allowed'));
+						return;
+					}
+
+					await client.destroy();
 
 					res.json(app.createResponse("OK"));
 				}
