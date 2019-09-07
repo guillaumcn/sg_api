@@ -12,7 +12,7 @@ module.exports = (app, db) =>
 			app.handlers.authenticate(),
 			app.handlers.check_params({
 				type: {
-					match: /^(?:admin|user|designer)$/
+					match: /^(?:admin|user)$/
 				}
 			}),
 			async (req, res) =>
@@ -54,7 +54,7 @@ module.exports = (app, db) =>
 				},
 				type: {
 					required: true,
-					match: /^(?:admin|user|designer)$/
+					match: /^(?:admin|user)$/
 				}
 			}),
 			async (req, res) =>
