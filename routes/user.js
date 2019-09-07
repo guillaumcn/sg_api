@@ -104,7 +104,7 @@ module.exports = (app, db) =>
 						return;
 					}
 
-					let user = await db.users.findOne({
+					let user = await db.user.findOne({
 						where: { id: req.params.id }
 					});
 
@@ -125,9 +125,15 @@ module.exports = (app, db) =>
 				}
 			})
 
-		// Modifie un membre avec ID
+		// update a user with its id
 		.put(
 			app.handlers.authenticate(),
+			app.handlers.check_params({
+				pass: {
+					min_length: 6,
+					max_length: 30
+				}
+			}),
 			async (req, res) =>
 			{
 				try 
@@ -150,7 +156,9 @@ module.exports = (app, db) =>
 						return;
 					}
 
-					await user.update({ name: req.body.name });
+					let update = {};
+					if (req.body.pass) update.pass = md5(req.body.pass);
+					await user.update(update);
 					res.json(app.createResponse("OK"));
 				}
 				catch (err)
@@ -160,7 +168,7 @@ module.exports = (app, db) =>
 				}
 			})
 
-		// remove a user with its id
+		// delete a user with its id
 		.delete(
 			app.handlers.authenticate(),
 			async (req, res) =>
