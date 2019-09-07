@@ -19,11 +19,6 @@ db.user = require('../models/user.js')(sequelize, Sequelize.DataTypes);
 db.client = require('../models/client.js')(sequelize, Sequelize.DataTypes);
 db.access_token = require('../models/access_token')(sequelize, Sequelize.DataTypes);
 db.refresh_token = require('../models/refresh_token')(sequelize, Sequelize.DataTypes);
-db.case = require('../models/case.js')(sequelize, Sequelize.DataTypes);
-db.grid = require('../models/grid.js')(sequelize, Sequelize.DataTypes);
-db.item = require('../models/item.js')(sequelize, Sequelize.DataTypes);
-db.product = require('../models/product.js')(sequelize, Sequelize.DataTypes);
-db.case_product = require('../models/case_product')(sequelize, Sequelize.DataTypes);
 
 //Relations
 db.user.hasMany(db.access_token, { foreignKey: 'user_id', sourceKey: 'id', as: 'access_tokens' });
