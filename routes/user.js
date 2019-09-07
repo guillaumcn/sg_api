@@ -29,7 +29,7 @@ module.exports = (app, db) =>
 					let where = {};
 					if (req.body.type) where.type = req.body.type;
 
-					let all_users = await db.user.findAll({where: where});
+					let all_users = await db.user.findAll({ where: where });
 					res.json(app.createResponse(all_users));
 				}
 				catch (err)
@@ -95,25 +95,19 @@ module.exports = (app, db) =>
 			app.handlers.authenticate(),
 			async (req, res) =>
 			{
-				let member = await db.members.findOne({
-					where: { id: req.params.id },
-					include: [
-						{
-							model: db.projects,
-						},
-						{
-							model: db.comments,
-						}
-					]
+				if (req.user.type != 'admin' && (req.params.id != req.user.id))
+				{
+					res.status(403);
+					res.json(app.createError('Not allowed'));
+					return;
+				}
+
+				let user = await db.users.findOne({
+					where: { id: req.params.id }
 				});
-				member = member.get({ plain: true });
 
-				if (req.body.projects_details != 1)
-					member.projects = member.projects.map(function (project) { return project.id });
-				if (req.body.comments_details != 1)
-					member.comments = member.comments.map(function (comment) { return comment.id });
-
-				res.json(checkAndChange(member || new Error(config.errors.wrongID)));
+				user.pass = undefined;
+				res.json(app.createResponse(user));
 			})
 
 		// Modifie un membre avec ID
