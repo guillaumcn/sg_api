@@ -11,10 +11,6 @@ module.exports = function(sequelize, DataTypes) {
 		name: {
 			type: DataTypes.STRING(255),
 			allowNull: false
-		},
-		user_id: {
-			type: DataTypes.INTEGER(11),
-			allowNull: false
 		}
 	}, {
 		tableName: 'grid',

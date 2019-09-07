@@ -41,9 +41,6 @@ db.access_token.belongsTo(db.client, { foreignKey: 'client_id', targetKey: 'id',
 db.client.hasMany(db.refresh_token, { foreignKey: 'client_id', sourceKey: 'id', as: 'refresh_tokens' });
 db.refresh_token.belongsTo(db.client, { foreignKey: 'client_id', targetKey: 'id', as: 'client' });
 
-db.user.hasMany(db.grid, { foreignKey: 'user_id', sourceKey: 'id', as: 'grids' });
-db.grid.belongsTo(db.user, { foreignKey: 'user_id', targetKey: 'id', as: 'user' });
-
 db.grid.hasMany(db.case, { foreignKey: 'grid_id', sourceKey: 'id', as: 'cases' });
 db.case.belongsTo(db.grid, { foreignKey: 'grid_id', targetKey: 'id', as: 'grid' });
 

@@ -193,7 +193,7 @@ module.exports = (app, db) =>
 						return;
 					}
 
-					await user.destroy({ name: req.body.name });
+					await user.destroy();
 					res.json(app.createResponse("OK"));
 				}
 				catch (err)
