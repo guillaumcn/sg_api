@@ -60,7 +60,7 @@ module.exports = (app, db) =>
 
 					let new_client = await db.client.create(
 						{
-							user_id: user,
+							user_id: parseInt(user),
 							type: 'public',
 							id: crypto.randomBytes(20).toString('hex'),
 							secret: crypto.randomBytes(10).toString('hex')

@@ -2,19 +2,19 @@ const express = require('express');
 
 module.exports = (app, db) =>
 {
-	let GridRouter = express.Router();
+	let ProductRouter = express.Router();
 
-	GridRouter.route('/')
+	ProductRouter.route('/')
 
-		// Get all grids
+		// Get all products
 		.get(
 			app.handlers.authenticate(),
 			async (req, res) =>
 			{
 				try 
 				{
-					let all_grids = await db.grid.findAll();
-					res.json(app.createResponse(all_grids));
+					let all_products = await db.product.findAll();
+					res.json(app.createResponse(all_products));
 				}
 				catch (err)
 				{
@@ -43,12 +43,12 @@ module.exports = (app, db) =>
 						return;
 					}
 
-					let new_grid = await db.grid.create(
+					let new_product = await db.product.create(
 						{
 							name: req.body.name
 						});
 
-					res.json(app.createResponse(new_grid));
+					res.json(app.createResponse(new_product));
 				}
 				catch (err)
 				{
@@ -57,47 +57,25 @@ module.exports = (app, db) =>
 				}
 			});
 
-	GridRouter.route('/:id')
+	ProductRouter.route('/:id')
 
 		// get a grid with its id
 		.get(
 			app.handlers.authenticate(),
-			app.handlers.check_params({
-				details: {
-					match: /(?:true|false|1|0)/
-				}
-			}),
 			async (req, res) =>
 			{
 				try
 				{
-					let request = {where: { id: req.params.id }};
-					if (req.body.details == 'true' || req.body.details == '1')
-					{
-						request.include = [{
-							model: db.case,
-							as: 'cases',
-							attributes: ['x', 'y'],
-							include: [
-								{
-									model: db.product,
-									as: 'products'
-								}
-							],
-							order: [db.sequelize.col('x'), db.sequelize.col('y')],
-						}];
-					}
-					
-					let grid = await db.grid.findOne(request);
+					let product = await db.product.findOne({ where: { id: req.params.id } });
 
-					if (!grid)
+					if (!product)
 					{
 						res.status(404);
 						res.json(app.createError('Object not found'));
 						return;
 					}
 
-					res.json(app.createResponse(grid));
+					res.json(app.createResponse(product));
 				}
 				catch (err)
 				{
@@ -106,7 +84,7 @@ module.exports = (app, db) =>
 				}
 			})
 
-		// update a grid with its id
+		// update a product with its id
 		.put(
 			app.handlers.authenticate(),
 			app.handlers.check_params({
@@ -125,11 +103,11 @@ module.exports = (app, db) =>
 						return;
 					}
 
-					let grid = await db.grid.findOne({
+					let product = await db.product.findOne({
 						where: { id: req.params.id }
 					});
 
-					if (!grid)
+					if (!product)
 					{
 						res.status(404);
 						res.json(app.createError('Object not found'));
@@ -138,7 +116,7 @@ module.exports = (app, db) =>
 
 					let update = {};
 					if (req.body.name) update.name = req.body.name;
-					await grid.update(update);
+					await product.update(update);
 
 					res.json(app.createResponse("OK"));
 				}
@@ -149,7 +127,7 @@ module.exports = (app, db) =>
 				}
 			})
 
-		// delete a grid with its id
+		// delete a product with its id
 		.delete(
 			app.handlers.authenticate(),
 			async (req, res) =>
@@ -163,18 +141,18 @@ module.exports = (app, db) =>
 						return;
 					}
 
-					let grid = await db.grid.findOne({
+					let product = await db.product.findOne({
 						where: { id: req.params.id }
 					});
 
-					if (!grid)
+					if (!product)
 					{
 						res.status(404);
 						res.json(app.createError('Object not found'));
 						return;
 					}
 
-					await grid.destroy();
+					await product.destroy();
 					res.json(app.createResponse("OK"));
 				}
 				catch (err)
@@ -184,5 +162,5 @@ module.exports = (app, db) =>
 				}
 			});
 
-	return GridRouter;
+	return ProductRouter;
 };

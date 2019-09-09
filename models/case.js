@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
 			type: DataTypes.INTEGER(11),
 			allowNull: false
 		},
-		item_id: {
+		item: {
 			type: DataTypes.INTEGER(11),
 			allowNull: false
 		}

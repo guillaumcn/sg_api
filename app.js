@@ -41,7 +41,9 @@ db.sequelize.authenticate()
 		app.use(config.rootAPI + 'oauth', require('./routes/oauth')(app, db));
 		app.use(config.rootAPI + 'user', require('./routes/user')(app, db));
 		app.use(config.rootAPI + 'client', require('./routes/client')(app, db));
+		app.use(config.rootAPI + 'product', require('./routes/product')(app, db));
 		app.use(config.rootAPI + 'grid', require('./routes/grid')(app, db));
+		app.use(config.rootAPI + 'grid', require('./routes/case')(app, db));
 
 		app.listen(config.port, () => console.log('Started on port ' + config.port));
 	})
