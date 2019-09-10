@@ -70,6 +70,23 @@ module.exports = (app, db) =>
 						return;
 					}
 
+					let neighbours = await db.case.findAll({
+						"where":
+							db.Sequelize.or(
+								{ "x": parseInt(req.body.x) - 1, "y": parseInt(req.body.y) },
+								{ "x": parseInt(req.body.x), "y": parseInt(req.body.y) + 1 },
+								{ "x": parseInt(req.body.x) + 1, "y": parseInt(req.body.y) },
+								{ "x": parseInt(req.body.x), "y": parseInt(req.body.y) - 1 }
+							)
+					});
+					
+					if (!neighbours || neighbours.length == 0)
+					{
+						res.status(400);
+						res.json(app.createError('Cannot create case without neighbours'));
+						return;
+					}
+
 					let new_case = await db.case.create(
 						{
 							x: parseInt(req.body.x),
@@ -82,6 +99,7 @@ module.exports = (app, db) =>
 				}
 				catch (err)
 				{
+					console.log(err);
 					if (err.parent.code == 'ER_DUP_ENTRY')
 					{
 						res.status(409);

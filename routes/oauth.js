@@ -6,6 +6,13 @@ module.exports = (app, db) =>
 	let OauthRouter = express.Router();
 
 	OauthRouter.route('/token').all(
+		(req, res, next) =>
+		{
+			// allow using of json instead of x-www-form-urlencoded
+			req.headers['content-type'] = 'application/x-www-form-urlencoded';
+
+			next();
+		},
 		app.handlers.check_params({
 			mail: {
 				required: true,

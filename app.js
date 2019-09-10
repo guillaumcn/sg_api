@@ -1,8 +1,13 @@
 const bodyParser = require('body-parser');
 const express = require('express');
-const morgan = require('morgan')('dev');
-const config = require('./assets/config');
 const oauthServer = require('oauth2-server');
+
+const morgan = require('morgan')('dev');
+
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./assets/swagger.json');
+
+const config = require('./assets/config');
 
 const db = require('./assets/db');
 
@@ -16,6 +21,8 @@ db.sequelize.authenticate()
 		app.use(morgan);
 		app.use(bodyParser.json());
 		app.use(bodyParser.urlencoded({ extended: true }));
+		// query parameters to body
+		app.use((req, res, next) => { for (let key in req.query) { if (req.body[key] === undefined) req.body[key] = req.query[key]; } next(); });
 
 		app.createResponse = (response) => { return { result: 'success', response: response } };
 		app.createError = (message) => { return { result: 'error', message: message } };
@@ -34,9 +41,11 @@ db.sequelize.authenticate()
 		app.route(config.rootAPI).all(app.handlers.authenticate(true), (req, res) =>
 		{
 			let text = '<h1>API Home</h1><br/><br/>';
-			if (req.isAuthenticated) text += '<h3>You\'re authenticated as '+req.user.mail+'</h3>';
+			if (req.isAuthenticated) text += '<h3>You\'re authenticated as ' + req.user.mail + '</h3>';
 			res.send(text);
 		});
+
+		app.use(config.rootAPI + 'api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 		app.use(config.rootAPI + 'oauth', require('./routes/oauth')(app, db));
 		app.use(config.rootAPI + 'user', require('./routes/user')(app, db));
