@@ -1,0 +1,444 @@
+{
+	"info": {
+		"title": "API REST Smart Grocery",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"description": ""
+	},
+	"basePath": "/api/v1",
+	"host": "localhost:8080",
+	"securityDefinitions": {
+		"basicAuth": {
+			"type": "basic"
+		},
+		"BearerAuth": {
+			"type": "bearer"
+		}
+	},
+	"tags": [
+		{
+			"name": "oauth",
+			"description": "OAuth 2.0 connexion"
+		},
+		{
+			"name": "user",
+			"description": "Users management"
+		}
+	],
+	"paths": {
+		"/oauth/token": {
+			"post": {
+				"tags": [
+					"oauth"
+				],
+				"summary": "oauth/token",
+				"security": [
+					{
+						"basicAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "mail",
+						"in": "query",
+						"type": "string",
+						"description": "User mail",
+						"example": "test@test.com",
+						"format": "mail",
+						"required": true
+					},
+					{
+						"name": "pass",
+						"in": "query",
+						"type": "string",
+						"minLength": 6,
+						"maxLength": 30,
+						"description": "User password",
+						"format": "password",
+						"required": true
+					},
+					{
+						"name": "grant_type",
+						"in": "query",
+						"type": "string",
+						"description": "Grant type",
+						"enum": [
+							"password"
+						],
+						"required": true
+					}
+				],
+				"produces": ["application/json"],
+				"responses": {
+					"200": {
+						"description" : "Tokens generated for the user",
+						"schema": {
+							"type": "object",
+							"properties": {
+								"accessToken": {
+									"type": "string",
+									"description": "Access token"
+								},
+								"accessTokenExpiresAt": {
+									"type": "string",
+									"description": "Access token expiration date"
+								},
+								"refreshToken": {
+									"type": "string",
+									"description": "Refresh token"
+								},
+								"refreshTokenExpiresAt": {
+									"type": "string",
+									"description": "Refresh token expiration date"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user": {
+			"get": {
+				"tags": [
+					"user"
+				],
+				"summary": "user",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {}
+			},
+			"post": {
+				"summary": "user",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {}
+			}
+		},
+		"/user/{id}": {
+			"get": {
+				"summary": "user/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"put": {
+				"summary": "user/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"delete": {
+				"summary": "user/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			}
+		},
+		"/client": {
+			"get": {
+				"summary": "client",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {}
+			},
+			"post": {
+				"summary": "client",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {}
+			}
+		},
+		"/client/{id}": {
+			"get": {
+				"summary": "client/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"put": {
+				"summary": "client/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"delete": {
+				"summary": "client/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			}
+		},
+		"/product": {
+			"get": {
+				"summary": "product",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {}
+			},
+			"post": {
+				"summary": "product",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {}
+			}
+		},
+		"/product/{id}": {
+			"get": {
+				"summary": "product/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"put": {
+				"summary": "product/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"delete": {
+				"summary": "product/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			}
+		},
+		"/grid": {
+			"get": {
+				"summary": "grid",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {}
+			},
+			"post": {
+				"summary": "grid",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {}
+			}
+		},
+		"/grid/{id}": {
+			"get": {
+				"summary": "grid/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"put": {
+				"summary": "grid/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"delete": {
+				"summary": "grid/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			}
+		},
+		"/grid/{grid_id}/case": {
+			"get": {
+				"summary": "grid/{grid_id}/case",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "grid_id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"post": {
+				"summary": "grid/{grid_id}/case",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "grid_id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			}
+		},
+		"/grid/{grid_id}/case/{id}": {
+			"get": {
+				"summary": "grid/{grid_id}/case/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "grid_id",
+						"in": "path",
+						"required": true
+					},
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"put": {
+				"summary": "grid/{grid_id}/case/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "grid_id",
+						"in": "path",
+						"required": true
+					},
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			},
+			"delete": {
+				"summary": "grid/{grid_id}/case/{id}",
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"name": "grid_id",
+						"in": "path",
+						"required": true
+					},
+					{
+						"name": "id",
+						"in": "path",
+						"required": true
+					}
+				],
+				"responses": {}
+			}
+		}
+	},
+	"swagger": "2.0"
+}
