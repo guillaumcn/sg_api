@@ -13,8 +13,10 @@
 		"basicAuth": {
 			"type": "basic"
 		},
-		"BearerAuth": {
-			"type": "bearer"
+		"bearerAuth": {
+			"type": "apiKey",
+			"name": "Authorization",
+			"in": "header"
 		}
 	},
 	"tags": [
@@ -25,6 +27,22 @@
 		{
 			"name": "user",
 			"description": "Users management"
+		},
+		{
+			"name": "client",
+			"description": "Clients management"
+		},
+		{
+			"name": "product",
+			"description": "Products management"
+		},
+		{
+			"name": "grid",
+			"description": "Grids management"
+		},
+		{
+			"name": "case",
+			"description": "Cases management"
 		}
 	],
 	"paths": {
@@ -33,7 +51,7 @@
 				"tags": [
 					"oauth"
 				],
-				"summary": "oauth/token",
+				"summary": "Get a token for an authenticated user",
 				"security": [
 					{
 						"basicAuth": []
@@ -45,7 +63,6 @@
 						"in": "query",
 						"type": "string",
 						"description": "User mail",
-						"example": "test@test.com",
 						"format": "mail",
 						"required": true
 					},
@@ -70,10 +87,12 @@
 						"required": true
 					}
 				],
-				"produces": ["application/json"],
+				"produces": [
+					"application/json"
+				],
 				"responses": {
 					"200": {
-						"description" : "Tokens generated for the user",
+						"description": "Tokens generated for the user",
 						"schema": {
 							"type": "object",
 							"properties": {
@@ -104,12 +123,53 @@
 				"tags": [
 					"user"
 				],
-				"summary": "user",
-				"consumes": [
+				"summary": "Get a list of users",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "type",
+						"in": "query",
+						"type": "string",
+						"description": "Users type",
+						"enum": [
+							"admin",
+							"user"
+						]
+					}
+				],
+				"produces": [
 					"application/json"
 				],
-				"parameters": [],
-				"responses": {}
+				"responses": {
+					"200": {
+						"description": "List of users",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"type": "integer",
+										"description": "User id"
+									},
+									"mail": {
+										"type": "string",
+										"description": "User email",
+										"format": "email"
+									},
+									"type": {
+										"type": "string",
+										"description": "User type"
+									}
+								}
+							}
+						}
+					}
+				}
 			},
 			"post": {
 				"summary": "user",
@@ -150,28 +210,96 @@
 				"responses": {}
 			},
 			"delete": {
-				"summary": "user/{id}",
-				"consumes": [
-					"application/json"
+				"tags": [
+					"user"
+				],
+				"summary": "Delete a targeted user",
+				"security": [
+					{
+						"bearerAuth": []
+					}
 				],
 				"parameters": [
 					{
 						"name": "id",
 						"in": "path",
-						"required": true
+						"type": "integer",
+						"description": "User ID"
 					}
 				],
-				"responses": {}
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				}
 			}
 		},
 		"/client": {
 			"get": {
-				"summary": "client",
-				"consumes": [
+				"tags": [
+					"client"
+				],
+				"summary": "Get a list of clients",
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "user_id",
+						"in": "query",
+						"type": "integer",
+						"description": "User ID"
+					},
+					{
+						"name": "type",
+						"in": "query",
+						"type": "string",
+						"description": "Clients type",
+						"enum": [
+							"public",
+							"confidential",
+							"web_application",
+							"native_application"
+						]
+					}
+				],
+				"produces": [
 					"application/json"
 				],
-				"parameters": [],
-				"responses": {}
+				"responses": {
+					"200": {
+						"description": "List of clients",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"type": "string",
+										"description": "Client id"
+									},
+									"secret": {
+										"type": "string",
+										"description": "Client secret"
+									},
+									"type": {
+										"type": "string",
+										"description": "Client type"
+									},
+									"user_id": {
+										"type": "integer",
+										"description": "User id"
+									}
+								}
+							}
+						}
+					}
+				}
 			},
 			"post": {
 				"summary": "client",
@@ -212,28 +340,69 @@
 				"responses": {}
 			},
 			"delete": {
-				"summary": "client/{id}",
-				"consumes": [
-					"application/json"
+				"tags": [
+					"client"
+				],
+				"summary": "Delete a targeted client",
+				"security": [
+					{
+						"bearerAuth": []
+					}
 				],
 				"parameters": [
 					{
 						"name": "id",
 						"in": "path",
-						"required": true
+						"type": "integer",
+						"description": "Client ID"
 					}
 				],
-				"responses": {}
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				}
 			}
 		},
 		"/product": {
 			"get": {
-				"summary": "product",
-				"consumes": [
-					"application/json"
+				"tags": [
+					"product"
+				],
+				"summary": "Get a list of products",
+				"security": [
+					{
+						"bearerAuth": []
+					}
 				],
 				"parameters": [],
-				"responses": {}
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "List of products",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"type": "integer",
+										"description": "Product id"
+									},
+									"name": {
+										"type": "string",
+										"description": "Product name"
+									}
+								}
+							}
+						}
+					}
+				}
 			},
 			"post": {
 				"summary": "product",
@@ -274,28 +443,69 @@
 				"responses": {}
 			},
 			"delete": {
-				"summary": "product/{id}",
-				"consumes": [
-					"application/json"
+				"tags": [
+					"product"
+				],
+				"summary": "Delete a targeted product",
+				"security": [
+					{
+						"bearerAuth": []
+					}
 				],
 				"parameters": [
 					{
 						"name": "id",
 						"in": "path",
-						"required": true
-					}
+						"type": "integer",
+						"description": "Product ID"
+					} 
 				],
-				"responses": {}
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				}
 			}
 		},
 		"/grid": {
 			"get": {
-				"summary": "grid",
-				"consumes": [
-					"application/json"
+				"tags": [
+					"grid"
+				],
+				"summary": "Get a list of grids",
+				"security": [
+					{
+						"bearerAuth": []
+					}
 				],
 				"parameters": [],
-				"responses": {}
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "List of grids",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"type": "integer",
+										"description": "Grid id"
+									},
+									"name": {
+										"type": "string",
+										"description": "Grid name"
+									}
+								}
+							}
+						}
+					}
+				}
 			},
 			"post": {
 				"summary": "grid",
@@ -336,48 +546,98 @@
 				"responses": {}
 			},
 			"delete": {
-				"summary": "grid/{id}",
-				"consumes": [
-					"application/json"
+				"tags": [
+					"grid"
+				],
+				"summary": "Delete a targeted grid",
+				"security": [
+					{
+						"bearerAuth": []
+					}
 				],
 				"parameters": [
 					{
 						"name": "id",
 						"in": "path",
-						"required": true
+						"type": "integer",
+						"description": "Grid ID"
 					}
 				],
-				"responses": {}
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				}
 			}
 		},
 		"/grid/{grid_id}/case": {
 			"get": {
-				"summary": "grid/{grid_id}/case",
-				"consumes": [
-					"application/json"
+				"tags": [
+					"case"
+				],
+				"summary": "Get a list of cases",
+				"security": [
+					{
+						"bearerAuth": []
+					}
 				],
 				"parameters": [
 					{
 						"name": "grid_id",
 						"in": "path",
-						"required": true
+						"type": "integer",
+						"description": "Grid id of the targeted(s) case(s)"
+					},
+					{
+						"name": "details",
+						"in": "query",
+						"type": "string",
+						"description": "Include product details in response",
+						"enum": [
+							"true",
+							"false"
+						]
 					}
 				],
-				"responses": {}
-			},
-			"post": {
-				"summary": "grid/{grid_id}/case",
-				"consumes": [
+				"produces": [
 					"application/json"
 				],
-				"parameters": [
-					{
-						"name": "grid_id",
-						"in": "path",
-						"required": true
+				"responses": {
+					"200": {
+						"description": "List of cases",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"type": "integer",
+										"description": "Case id"
+									},
+									"x": {
+										"type": "integer",
+										"description": "Case x position"
+									},
+									"y": {
+										"type": "string",
+										"description": "Case y position"
+									},
+									"grid_id": {
+										"type": "integer",
+										"description": "Grid id"
+									},
+									"item": {
+										"type": "integer",
+										"description": "Item"
+									}
+								}
+							}
+						}
 					}
-				],
-				"responses": {}
+				}
 			}
 		},
 		"/grid/{grid_id}/case/{id}": {
@@ -420,23 +680,37 @@
 				"responses": {}
 			},
 			"delete": {
-				"summary": "grid/{grid_id}/case/{id}",
-				"consumes": [
-					"application/json"
+				"tags": [
+					"case"
+				],
+				"summary": "Delete a targeted case",
+				"security": [
+					{
+						"bearerAuth": []
+					}
 				],
 				"parameters": [
 					{
 						"name": "grid_id",
 						"in": "path",
-						"required": true
+						"type": "integer",
+						"description": "Grid id of the targeted(s) case(s)"
 					},
 					{
 						"name": "id",
 						"in": "path",
-						"required": true
+						"type": "integer",
+						"description": "Case ID"
 					}
 				],
-				"responses": {}
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				}
 			}
 		}
 	},

@@ -54,8 +54,8 @@ module.exports = function (db)
 					}
 				]
 			});
-			rt.refreshToken = at.get('refreshToken');
-			at.refreshTokenExpiresAt = at.get('refreshTokenExpiresAt');
+			rt.refreshToken = rt.get('refreshToken');
+			rt.refreshTokenExpiresAt = rt.get('refreshTokenExpiresAt');
 
 			resolve(rt);
 		});
@@ -88,7 +88,6 @@ module.exports = function (db)
 					pass: md5(pass)
 				}
 			});
-			console.log(user);
 			resolve(user);
 		});
 	};
