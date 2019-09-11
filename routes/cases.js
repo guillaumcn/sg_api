@@ -103,13 +103,11 @@ module.exports = (app, db) =>
 						return;
 					}
 
-					let cond = {
+					await db.case.update({ item: parseInt(req.body.item) }, {
 						where: db.sequelize.or(
 							{ id: JSON.parse(req.body.cases) }
 						)
-					};
-
-					await db.case.update({ item: parseInt(req.body.item) }, cond);
+					});
 
 					res.json(app.createResponse('OK'));
 				}
