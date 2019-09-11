@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le :  Dim 08 sep. 2019 à 00:00
+-- Généré le :  mer. 11 sep. 2019 à 19:55
 -- Version du serveur :  10.4.6-MariaDB
 -- Version de PHP :  7.3.8
 
@@ -47,7 +47,7 @@ CREATE TABLE `case` (
   `x` int(11) NOT NULL,
   `y` int(11) NOT NULL,
   `grid_id` int(11) NOT NULL,
-  `item_id` int(11) NOT NULL
+  `item` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -74,6 +74,13 @@ CREATE TABLE `client` (
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+--
+-- Déchargement des données de la table `client`
+--
+
+INSERT INTO `client` (`id`, `secret`, `type`, `user_id`) VALUES
+('app', 'app', 'public', 15);
+
 -- --------------------------------------------------------
 
 --
@@ -83,18 +90,6 @@ CREATE TABLE `client` (
 CREATE TABLE `grid` (
   `id` int(11) NOT NULL,
   `name` varchar(255) COLLATE utf8_bin NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- --------------------------------------------------------
-
---
--- Structure de la table `item`
---
-
-CREATE TABLE `item` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) COLLATE utf8_bin NOT NULL,
-  `color` varchar(255) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -136,6 +131,13 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
+-- Déchargement des données de la table `user`
+--
+
+INSERT INTO `user` (`id`, `mail`, `pass`, `type`) VALUES
+(15, 'admin@sg.com', '0192023a7bbd73250516f069df18b500', 'admin');
+
+--
 -- Index pour les tables déchargées
 --
 
@@ -151,9 +153,7 @@ ALTER TABLE `access_token`
 -- Index pour la table `case`
 --
 ALTER TABLE `case`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `case_grid_fk` (`grid_id`),
-  ADD KEY `case_item_fk` (`item_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Index pour la table `case_product`
@@ -174,14 +174,6 @@ ALTER TABLE `client`
 --
 ALTER TABLE `grid`
   ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `item`
---
-ALTER TABLE `item`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD UNIQUE KEY `color` (`color`);
 
 --
 -- Index pour la table `product`
@@ -212,43 +204,37 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT pour la table `access_token`
 --
 ALTER TABLE `access_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `case`
 --
 ALTER TABLE `case`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT pour la table `grid`
 --
 ALTER TABLE `grid`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `item`
---
-ALTER TABLE `item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `refresh_token`
 --
 ALTER TABLE `refresh_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Contraintes pour les tables déchargées
@@ -260,13 +246,6 @@ ALTER TABLE `user`
 ALTER TABLE `access_token`
   ADD CONSTRAINT `access_token_client_fk` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `access_token_user_fk` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Contraintes pour la table `case`
---
-ALTER TABLE `case`
-  ADD CONSTRAINT `case_grid_fk` FOREIGN KEY (`grid_id`) REFERENCES `grid` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `case_item_fk` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `case_product`
